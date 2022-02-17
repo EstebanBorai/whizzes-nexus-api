@@ -5,6 +5,7 @@ use std::str::FromStr;
 pub struct Config {
     pub host: IpAddr,
     pub port: u16,
+    pub database_url: String,
     pub server_config: rocket::Config,
 }
 
@@ -12,6 +13,7 @@ impl Config {
     pub fn new() -> Self {
         let port = Config::env_var::<u16>("PORT");
         let host = Config::env_var::<IpAddr>("HOST");
+        let database_url = Config::env_var::<String>("DATABASE_URL");
         let server_config = rocket::Config {
             address: host,
             port,
@@ -21,6 +23,7 @@ impl Config {
         Config {
             host,
             port,
+            database_url,
             server_config,
         }
     }

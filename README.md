@@ -17,6 +17,7 @@
 ## Requirements
 
 - Rust and Cargo ([Rustup](https://rustup.rs))
+- [Diesel CLI](#install-diesel-cli)
 
 ## Getting Started
 
@@ -26,10 +27,51 @@
 git clone https://github.com/whizzbit/nexus-server.git
 ```
 
-2. Run the server
+2. Create a copy of `.env.sample` in a new file with the name: `.env`
+
+3. Execute Docker containers running `docker-compose up`
+
+4. Run database migrations running `diesel migration run`. [You must complete Diesel Setup First](#install-diesel-cli).
+
+5. Open a new terminal session and run the server
 
 ```bash
 cargo run
+```
+
+## Install Diesel CLI
+
+This project uses Diesel ORM to perform database related operations.
+
+It's recommended to install the Diesel CLI binary using `cargo install`
+to use this project.
+
+1. Install `libpq`
+
+1.1. (macOS) Install `libpq` using Homebrew
+
+```bash
+brew install libpq
+```
+
+1.2. (Ubuntu/Linux) Install `libpq` using `apt-get`
+
+```bash
+sudo apt-get update && sudo apt-get install libpq-dev
+```
+
+> [Issues? Perhaps this StackExchange question may help](https://askubuntu.com/a/713442)
+
+2. The add the library to your PATH
+
+```bash
+echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.zshrc
+```
+
+3. Finally install Diesel CLI
+
+```bash
+cargo install diesel_cli --no-default-features --features "postgres"
 ```
 
 # Contributing

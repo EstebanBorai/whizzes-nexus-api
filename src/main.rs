@@ -1,10 +1,12 @@
 mod config;
+mod database;
 mod routes;
 
 use dotenv::dotenv;
 use std::env;
 
 use self::config::Config;
+use self::database::Database;
 use self::routes::index;
 
 #[rocket::launch]
@@ -16,6 +18,7 @@ async fn rocket() -> _ {
     }
 
     let config = Config::new();
+    let _database = Database::new(&config);
 
     rocket::custom(&config.server_config).mount("/", rocket::routes![index])
 }
