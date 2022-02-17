@@ -6,6 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-graphql = { version = "3.0.15", features = ["chrono", "uuid"] }
+async-graphql-rocket = "3.0.15"
+base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenv = "0.15.0"
 diesel = { version = "1.4.4", features = ["chrono", "postgres", "r2d2", "uuidv07"] }

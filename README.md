@@ -74,6 +74,16 @@ echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.zshrc
 cargo install diesel_cli --no-default-features --features "postgres"
 ```
 
+## GraphQL
+
+The API exposed is build using async-graphql, which is a GraphQL implementation
+build for Rust.
+
+Visit the playground on [http://host:port/graphql](http://0.0.0.0:7878/graphql), when running
+the project locally.
+
+> This GraphQL implementation uses the [Cursors Connections Pattern](https://relay.dev/graphql/connections.htm).
+
 # Contributing
 
 Every kind of contribution to this project is welcome, please, don't hesitate

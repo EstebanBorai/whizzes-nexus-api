@@ -1,17 +1,22 @@
 mod config;
 mod database;
-mod domain;
 mod error;
+mod graphql;
+mod modules;
 mod routes;
 mod schema;
 mod services;
 
+use async_graphql::{EmptyMutation, EmptySubscription};
 use dotenv::dotenv;
+use rocket::routes;
 use std::env;
+use std::sync::Arc;
 
 use self::config::Config;
 use self::database::Database;
-use self::routes::index;
+use self::graphql::{Query, Schema};
+use self::routes::{graphql_playground, graphql_query, graphql_request};
 use self::services::Services;
 
 #[macro_use]
@@ -28,10 +33,16 @@ async fn rocket() -> _ {
     let config = Config::new();
     let database = Database::new(&config);
     let services = Services::new(database);
+    let services = Arc::new(services);
+    let graphql_schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
+        .data(Arc::clone(&services))
+        .finish();
 
-    let users = services.user.find_all().await.unwrap();
-
-    println!("{:?}", users);
-
-    rocket::custom(&config.server_config).mount("/", rocket::routes![index])
+    rocket::custom(&config.server_config)
+        .manage(Arc::clone(&services))
+        .manage(graphql_schema)
+        .mount(
+            "/",
+            routes![graphql_playground, graphql_query, graphql_request],
+        )
 }

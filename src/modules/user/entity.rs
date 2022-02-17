@@ -1,3 +1,4 @@
+use async_graphql::SimpleObject;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
@@ -5,7 +6,7 @@ use uuid::Uuid;
 
 use crate::schema::users;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SimpleObject)]
 pub struct User {
     pub id: Uuid,
     pub name: String,

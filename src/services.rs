@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::database::Database;
-use crate::domain::user::UserService;
+use crate::modules::user::UserService;
 
 pub struct Services {
     pub user: Arc<UserService>,
