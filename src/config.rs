@@ -1,8 +1,9 @@
 use std::env;
-use std::net::{IpAddr, Ipv4Addr};
+use std::net::IpAddr;
 use std::str::FromStr;
 
 pub struct Config {
+    pub host: IpAddr,
     pub port: u16,
     pub server_config: rocket::Config,
 }
@@ -10,14 +11,15 @@ pub struct Config {
 impl Config {
     pub fn new() -> Self {
         let port = Config::env_var::<u16>("PORT");
-        let address = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
+        let host = Config::env_var::<IpAddr>("HOST");
         let server_config = rocket::Config {
-            address,
+            address: host,
             port,
             ..rocket::Config::default()
         };
 
         Config {
+            host,
             port,
             server_config,
         }
