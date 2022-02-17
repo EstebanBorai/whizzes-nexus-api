@@ -1,6 +1,10 @@
 mod config;
 mod database;
+mod domain;
+mod error;
 mod routes;
+mod schema;
+mod services;
 
 use dotenv::dotenv;
 use std::env;
@@ -8,6 +12,10 @@ use std::env;
 use self::config::Config;
 use self::database::Database;
 use self::routes::index;
+use self::services::Services;
+
+#[macro_use]
+extern crate diesel;
 
 #[rocket::launch]
 async fn rocket() -> _ {
@@ -18,7 +26,12 @@ async fn rocket() -> _ {
     }
 
     let config = Config::new();
-    let _database = Database::new(&config);
+    let database = Database::new(&config);
+    let services = Services::new(database);
+
+    let users = services.user.find_all().await.unwrap();
+
+    println!("{:?}", users);
 
     rocket::custom(&config.server_config).mount("/", rocket::routes![index])
 }
