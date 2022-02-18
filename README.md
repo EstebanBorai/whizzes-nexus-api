@@ -10,7 +10,7 @@
 
 </div>
 
->  Nexus formal definition: a relationship or connection between people or things. [Source](https://www.merriam-webster.com/dictionary/nexus).
+>  Nexus formal definition: a relationship or connection between people or things. [Source][5].
 
 # Development
 
@@ -60,7 +60,7 @@ brew install libpq
 sudo apt-get update && sudo apt-get install libpq-dev
 ```
 
-> [Issues? Perhaps this StackExchange question may help](https://askubuntu.com/a/713442)
+> [Issues? Perhaps this StackExchange question may help][4].
 
 2. The add the library to your PATH
 
@@ -79,12 +79,23 @@ cargo install diesel_cli --no-default-features --features "postgres"
 The API exposed is build using async-graphql, which is a GraphQL implementation
 build for Rust.
 
-Visit the playground on [http://host:port/graphql](http://0.0.0.0:7878/graphql), when running
+Visit the playground on [http://host:port/graphql][3], when running
 the project locally.
 
-> This GraphQL implementation uses the [Cursors Connections Pattern](https://relay.dev/graphql/connections.htm).
+> This GraphQL implementation uses the [Cursors Connections Pattern][2].
+
+### The `DateTime` scalar
+
+Our GraphQL gateway implements the `DateTime` scalar to specify date values.
+You can read more on this scalar here: [DateTime][1].
 
 # Contributing
 
 Every kind of contribution to this project is welcome, please, don't hesitate
 to open a Pull Request or Issue. I will be happy to help!
+
+[1]: https://www.graphql-scalars.com/date-time/#only-date-time
+[2]: https://relay.dev/graphql/connections.htm
+[3]: http://0.0.0.0:7878/graphql
+[4]: https://askubuntu.com/a/713442
+[5]: https://www.merriam-webster.com/dictionary/nexus

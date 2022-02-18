@@ -7,7 +7,7 @@ mod routes;
 mod schema;
 mod services;
 
-use async_graphql::{EmptyMutation, EmptySubscription};
+use async_graphql::EmptySubscription;
 use dotenv::dotenv;
 use rocket::routes;
 use std::env;
@@ -15,7 +15,7 @@ use std::sync::Arc;
 
 use self::config::Config;
 use self::database::Database;
-use self::graphql::{Query, Schema};
+use self::graphql::{Mutation, Query, Schema};
 use self::routes::{graphql_playground, graphql_query, graphql_request};
 use self::services::Services;
 
@@ -34,7 +34,7 @@ async fn rocket() -> _ {
     let database = Database::new(&config);
     let services = Services::new(database);
     let services = Arc::new(services);
-    let graphql_schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
+    let graphql_schema = Schema::build(Query::default(), Mutation::default(), EmptySubscription)
         .data(Arc::clone(&services))
         .finish();
 
