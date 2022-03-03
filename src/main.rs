@@ -1,6 +1,5 @@
 mod config;
 mod database;
-mod error;
 mod graphql;
 mod modules;
 mod routes;
@@ -18,6 +17,13 @@ use self::database::Database;
 use self::graphql::{Mutation, Query, Schema};
 use self::routes::{graphql_playground, graphql_query, graphql_request};
 use self::services::Services;
+
+/// A single `Result` type to narrow error handling and expose the error to
+/// the client.
+///
+/// Any `struct` that implements `std::fmt::Display` or the `std::error::Error`
+/// trait is compatible with the error wrapped by this `Result`.
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[macro_use]
 extern crate diesel;

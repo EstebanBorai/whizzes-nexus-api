@@ -1,3 +1,4 @@
+use rocket::config::LogLevel;
 use std::env;
 use std::net::IpAddr;
 use std::str::FromStr;
@@ -14,9 +15,15 @@ impl Config {
         let port = Config::env_var::<u16>("PORT");
         let host = Config::env_var::<IpAddr>("HOST");
         let database_url = Config::env_var::<String>("DATABASE_URL");
+        let log_level = if cfg!(debug_assertions) {
+            LogLevel::Debug
+        } else {
+            LogLevel::Critical
+        };
         let server_config = rocket::Config {
             address: host,
             port,
+            log_level,
             ..rocket::Config::default()
         };
 
