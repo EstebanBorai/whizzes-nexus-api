@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 pub struct Config {
     pub host: IpAddr,
+    pub jwt_secret: String,
     pub port: u16,
     pub database_url: String,
     pub server_config: rocket::Config,
@@ -14,6 +15,7 @@ impl Config {
     pub fn new() -> Self {
         let port = Config::env_var::<u16>("PORT");
         let host = Config::env_var::<IpAddr>("HOST");
+        let jwt_secret = Config::env_var::<String>("JWT_SECRET");
         let database_url = Config::env_var::<String>("DATABASE_URL");
         let log_level = if cfg!(debug_assertions) {
             LogLevel::Debug
@@ -29,6 +31,7 @@ impl Config {
 
         Config {
             host,
+            jwt_secret,
             port,
             database_url,
             server_config,

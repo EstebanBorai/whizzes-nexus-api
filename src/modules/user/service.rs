@@ -36,6 +36,10 @@ impl UserService {
         Ok(users)
     }
 
+    pub async fn find_by_username(&self, username: &str) -> Result<User> {
+        self.repository.find_by_username(username).await
+    }
+
     pub async fn create(&self, payload: UserCreateDto) -> Result<User> {
         let password_hash = self.hash_password(&payload.password)?;
 

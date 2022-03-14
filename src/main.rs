@@ -38,7 +38,7 @@ async fn rocket() -> _ {
 
     let config = Config::new();
     let database = Database::new(&config);
-    let services = Services::new(database);
+    let services = Services::new(&config, database);
     let services = Arc::new(services);
     let graphql_schema = Schema::build(Query::default(), Mutation::default(), EmptySubscription)
         .data(Arc::clone(&services))
