@@ -69,6 +69,16 @@ impl UserRepository {
         Ok(users)
     }
 
+    pub async fn find_by_username(&self, username: &str) -> Result<User> {
+        let conn = self.database.conn_pool.get()?;
+        let row = users::table
+            .filter(users::username.eq(username))
+            .limit(1)
+            .first::<UsersTableRow>(&conn)?;
+
+        Ok(User::from(row))
+    }
+
     pub async fn insert(&self, dto: InsertUserTableRow) -> Result<User> {
         let conn = self.database.conn_pool.get()?;
         let row = diesel::insert_into(users::table)
