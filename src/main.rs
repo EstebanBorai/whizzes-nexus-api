@@ -1,7 +1,10 @@
+mod catchers;
 mod config;
 mod database;
+mod fairings;
 mod graphql;
 mod modules;
+mod responders;
 mod routes;
 mod schema;
 mod services;
@@ -15,7 +18,7 @@ use std::sync::Arc;
 use self::config::Config;
 use self::database::Database;
 use self::graphql::{Mutation, Query, Schema};
-use self::routes::{graphql_playground, graphql_query, graphql_request};
+use self::routes::{cors_preflight, graphql_playground, graphql_query, graphql_request};
 use self::services::Services;
 
 /// A single `Result` type to narrow error handling and expose the error to
@@ -45,10 +48,17 @@ async fn rocket() -> _ {
         .finish();
 
     rocket::custom(&config.server_config)
+        .attach(fairings::cors::Cors)
         .manage(Arc::clone(&services))
         .manage(graphql_schema)
         .mount(
             "/",
-            routes![graphql_playground, graphql_query, graphql_request],
+            routes![
+                cors_preflight,
+                graphql_playground,
+                graphql_query,
+                graphql_request
+            ],
         )
+        .register("/", rocket::catchers![catchers::not_found])
 }

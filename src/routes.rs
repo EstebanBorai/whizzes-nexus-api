@@ -1,8 +1,15 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
-use rocket::{response::content, State};
+use rocket::response::content;
+use rocket::State;
 
 use crate::graphql::Schema;
+use crate::responders::cors::{Cors, CorsPreflight};
+
+#[rocket::options("/<_..>")]
+pub fn cors_preflight() -> CorsPreflight {
+    Cors::preflight("http://localhost:3000")
+}
 
 #[rocket::get("/graphql")]
 pub fn graphql_playground() -> content::Html<String> {
