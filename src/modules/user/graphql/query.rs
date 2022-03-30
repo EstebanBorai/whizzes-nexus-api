@@ -3,13 +3,22 @@ use std::sync::Arc;
 
 use crate::graphql::relay;
 use crate::modules::user::User;
+use crate::routes::AuthToken;
 use crate::services::Services;
+use crate::Result;
 
 #[derive(Default)]
 pub struct UserQuery;
 
 #[Object]
 impl UserQuery {
+    #[graphql(name = "me")]
+    async fn me(&self, ctx: &Context<'_>) -> Result<String> {
+        let auth = ctx.data::<AuthToken>().unwrap();
+        // Fetch user with token
+        Ok(auth.token())
+    }
+
     async fn users(
         &self,
         ctx: &Context<'_>,
