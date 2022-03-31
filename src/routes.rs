@@ -38,7 +38,7 @@ pub fn cors_preflight() -> CorsPreflight {
     Cors::preflight("http://localhost:3000")
 }
 
-#[rocket::get("/graphql")]
+#[rocket::post("/graphql")]
 pub fn graphql_playground() -> content::Html<String> {
     content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }

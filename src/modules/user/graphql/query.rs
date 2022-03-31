@@ -13,10 +13,11 @@ pub struct UserQuery;
 #[Object]
 impl UserQuery {
     #[graphql(name = "me")]
-    async fn me(&self, ctx: &Context<'_>) -> Result<String> {
+    async fn me(&self, ctx: &Context<'_>) -> Result<User> {
         let auth = ctx.data::<AuthToken>().unwrap();
-        // Fetch user with token
-        Ok(auth.token())
+        let services = ctx.data::<Arc<Services>>().unwrap();
+
+        services.auth.whoami(auth.token()).await
     }
 
     async fn users(
