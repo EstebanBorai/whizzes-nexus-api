@@ -17,7 +17,7 @@ impl UserQuery {
         let auth = ctx.data::<AuthToken>().unwrap();
         let services = ctx.data::<Arc<Services>>().unwrap();
 
-        services.auth.whoami(auth.token()).await
+        services.auth.whoami(auth.token().unwrap()).await
     }
 
     async fn users(

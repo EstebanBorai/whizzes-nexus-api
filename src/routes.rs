@@ -9,11 +9,21 @@ use crate::responders::cors::{Cors, CorsPreflight};
 
 #[derive(Debug)]
 pub struct AuthToken {
-    token: String,
+    token: Option<String>,
 }
 
 impl AuthToken {
-    pub fn token(&self) -> String {
+    pub fn new(token: &str) -> Self {
+        Self {
+            token: Some(token.to_string()),
+        }
+    }
+
+    pub fn empty() -> Self {
+        Self { token: None }
+    }
+
+    pub fn token(&self) -> Option<String> {
         self.token.clone()
     }
 }
@@ -23,13 +33,15 @@ impl<'r> FromRequest<'r> for AuthToken {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        if let Some(auth_header_value) = request.headers().get_one("Authorization") {
-            return Outcome::Success(AuthToken {
-                token: auth_header_value.into(),
-            });
+        let authorization_header = request.headers().get_one("Authorization");
+
+        if let Some(auth_header_value) = authorization_header {
+            let auth_token = AuthToken::new(auth_header_value);
+
+            return Outcome::Success(auth_token);
         }
 
-        Outcome::Forward(())
+        Outcome::Success(AuthToken::empty())
     }
 }
 
@@ -38,7 +50,7 @@ pub fn cors_preflight() -> CorsPreflight {
     Cors::preflight("http://localhost:3000")
 }
 
-#[rocket::post("/graphql")]
+#[rocket::get("/graphql")]
 pub fn graphql_playground() -> content::Html<String> {
     content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
