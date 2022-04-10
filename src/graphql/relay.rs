@@ -4,6 +4,8 @@ use base64::{decode_config, encode_config, DecodeError, URL_SAFE_NO_PAD};
 use std::convert::Infallible;
 use std::fmt::Display;
 
+use crate::error::{Error, Result};
+
 #[derive(Debug)]
 pub enum Base64CursorError {
     /// Invalid cursor. This can happen if the base64 string is valid, but its
@@ -40,7 +42,7 @@ impl Base64Cursor {
     }
 
     /// Decode the Base64 string representation of the `Cursor`
-    fn decode(base64_str: &str) -> Result<Self, Base64CursorError> {
+    fn decode(base64_str: &str) -> std::result::Result<Self, Base64CursorError> {
         let bytes =
             decode_config(base64_str, URL_SAFE_NO_PAD).map_err(Base64CursorError::DecodeError)?;
 
@@ -90,9 +92,11 @@ pub struct ConnectionFields {
     total_count: usize,
 }
 
-/// Relay connection result
-pub type ConnectionResult<T> =
-    async_graphql::Result<Connection<Base64Cursor, T, ConnectionFields, EmptyFields>>;
+/// Relay Connection
+pub type RelayConnection<T> = Connection<Base64Cursor, T, ConnectionFields, EmptyFields>;
+
+/// Relay connection Result
+pub type ConnectionResult<T> = Result<RelayConnection<T>>;
 
 /// Relay-compliant connection parameters
 pub struct Params {
@@ -160,4 +164,5 @@ pub async fn query<T, I: ExactSizeIterator<Item = T>>(
         },
     )
     .await
+    .map_err(|_err| Error::server_error())
 }

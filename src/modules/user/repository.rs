@@ -6,8 +6,8 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::database::Database;
+use crate::error::Result;
 use crate::schema::users;
-use crate::Result;
 
 use super::entity::User;
 
