@@ -1,25 +1,12 @@
 use argon2::{self, Config};
-use async_graphql::InputObject;
-use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-use crate::Result;
+use crate::error::Result;
+use crate::modules::user::graphql::account_register::AccountRegisterInput;
 
 use super::{InsertUserTableRow, User, UserRepository};
-
-#[derive(Deserialize, Serialize, InputObject)]
-#[graphql(input_name = "UserCreateInput")]
-pub struct UserCreateDto {
-    name: String,
-    last_name: String,
-    email: String,
-    username: String,
-    password: String,
-    birthdate: DateTime<Utc>,
-}
 
 pub struct UserService {
     repository: Arc<UserRepository>,
@@ -40,10 +27,10 @@ impl UserService {
         self.repository.find_by_username(username).await
     }
 
-    pub async fn create(&self, payload: UserCreateDto) -> Result<User> {
+    pub async fn create(&self, payload: AccountRegisterInput) -> Result<User> {
         let password_hash = self.hash_password(&payload.password)?;
-
-        self.repository
+        let inserted = self
+            .repository
             .insert(InsertUserTableRow {
                 name: payload.name,
                 last_name: payload.last_name,
@@ -52,7 +39,9 @@ impl UserService {
                 password_hash,
                 birthdate: payload.birthdate,
             })
-            .await
+            .await?;
+
+        Ok(inserted)
     }
 
     fn hash_password(&self, raw: &str) -> Result<String> {

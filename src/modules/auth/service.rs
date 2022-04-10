@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::config::Config;
+use crate::error::{Error, ErrorCode, Result};
 use crate::modules::user::{User, UserService};
-use crate::Result;
 
-use super::Token;
+use super::Tokens;
 
 pub struct AuthService {
     jwt_secret: Vec<u8>,
@@ -32,7 +32,7 @@ impl AuthService {
 
     /// Validate provided `username` and `password`. If valid, fetches the
     /// corresponding user and signs a JSON Web Token.
-    pub async fn create_token(&self, username: String, password: String) -> Result<Token> {
+    pub async fn create_token(&self, username: String, password: String) -> Result<Tokens> {
         let user = self.user_service.find_by_username(&username).await?;
         let is_valid_password = argon2::verify_encoded(&user.password_hash, password.as_bytes())?;
 
@@ -50,16 +50,16 @@ impl AuthService {
                 uid: username,
             };
 
-            let token = encode(
+            let access_token = encode(
                 &Header::default(),
                 &claims,
                 &EncodingKey::from_secret(&self.jwt_secret),
             )?;
 
-            return Ok(Token { token });
+            return Ok(Tokens { access_token });
         }
 
-        Err(String::from("Err").into())
+        Err(Error::code(ErrorCode::InvalidCredentials))
     }
 
     /// Retrieves the User Data for the provided token
