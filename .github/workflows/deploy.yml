@@ -21,6 +21,7 @@ jobs:
 
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
+          buildpack: "https://github.com/emk/heroku-buildpack-rust.git"
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
