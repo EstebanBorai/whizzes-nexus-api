@@ -12,6 +12,11 @@
 
 >  Nexus formal definition: a relationship or connection between people or things. [Source][5].
 
+# Deployment
+
+This application is published to a Heroku Dyno instance using the
+[emk/heroku-buildpack-rust][6] on every push to `main` [throught this action][7].
+
 # Development
 
 ## Requirements
@@ -99,3 +104,5 @@ to open a Pull Request or Issue. I will be happy to help!
 [3]: http://0.0.0.0:7878/graphql
 [4]: https://askubuntu.com/a/713442
 [5]: https://www.merriam-webster.com/dictionary/nexus
+[6]: https://github.com/emk/heroku-buildpack-rust.git
+[7]: https://github.com/whizzbit/nexus-api/blob/main/.github/workflows/deploy.yml
