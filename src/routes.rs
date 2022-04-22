@@ -55,11 +55,6 @@ pub fn graphql_playground() -> content::Html<String> {
     content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
-#[rocket::get("/graphql?<query..>")]
-pub async fn graphql_query(schema: &State<Schema>, query: GraphQLQuery) -> GraphQLResponse {
-    query.execute(schema).await
-}
-
 #[rocket::post("/graphql", data = "<request>", format = "application/json")]
 pub async fn graphql_request(
     schema: &State<Schema>,

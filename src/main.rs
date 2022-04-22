@@ -19,7 +19,7 @@ use std::sync::Arc;
 use self::config::Config;
 use self::database::Database;
 use self::graphql::{Mutation, Query, Schema};
-use self::routes::{cors_preflight, graphql_playground, graphql_query, graphql_request};
+use self::routes::{cors_preflight, graphql_playground, graphql_request};
 use self::services::Services;
 
 /// A single `Result` type to narrow error handling and expose the error to
@@ -54,12 +54,7 @@ async fn rocket() -> _ {
         .manage(graphql_schema)
         .mount(
             "/",
-            routes![
-                cors_preflight,
-                graphql_playground,
-                graphql_query,
-                graphql_request
-            ],
+            routes![cors_preflight, graphql_playground, graphql_request],
         )
         .register("/", rocket::catchers![catchers::not_found])
 }
