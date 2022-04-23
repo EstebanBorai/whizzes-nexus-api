@@ -15,6 +15,16 @@ pub enum PostErrorCode {
     Unauthorized,
 }
 
+impl PostError {
+    pub fn unathorized() -> Self {
+        PostError {
+            field: None,
+            message: Some(String::from("Token is either missing or invalid.")),
+            code: PostErrorCode::Unauthorized,
+        }
+    }
+}
+
 impl TryFrom<Error> for PostError {
     type Error = Error;
 

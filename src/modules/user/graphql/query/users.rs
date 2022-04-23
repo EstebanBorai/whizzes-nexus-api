@@ -5,6 +5,7 @@ use crate::error::Result;
 use crate::graphql::relay::{self, RelayConnection};
 use crate::modules::user::graphql::types::UserError;
 use crate::modules::user::User;
+use crate::routes::AuthToken;
 use crate::services::Services;
 
 #[derive(SimpleObject)]
@@ -21,7 +22,16 @@ impl Users {
         first: Option<i32>,
         last: Option<i32>,
     ) -> Result<Users> {
-        let services = ctx.data::<Arc<Services>>().unwrap();
+        let auth = ctx.data_unchecked::<AuthToken>();
+        let services = ctx.data_unchecked::<Arc<Services>>();
+
+        if auth.token().is_none() {
+            return Ok(Users {
+                users: None,
+                error: Some(UserError::unathorized()),
+            });
+        }
+
         let result = services.user.find_all().await;
 
         match result {

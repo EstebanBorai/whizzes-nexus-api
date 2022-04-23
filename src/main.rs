@@ -28,7 +28,6 @@ use self::services::Services;
 /// Any `struct` that implements `std::fmt::Display` or the `std::error::Error`
 /// trait is compatible with the error wrapped by this `Result`.
 /// pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
-
 #[macro_use]
 extern crate diesel;
 

@@ -16,8 +16,16 @@ pub struct Me {
 
 impl Me {
     pub async fn exec(ctx: &Context<'_>) -> Result<Self> {
-        let auth = ctx.data::<AuthToken>().unwrap();
-        let services = ctx.data::<Arc<Services>>().unwrap();
+        let auth = ctx.data_unchecked::<AuthToken>();
+        let services = ctx.data_unchecked::<Arc<Services>>();
+
+        if auth.token().is_none() {
+            return Ok(Me {
+                me: None,
+                error: Some(UserError::unathorized()),
+            });
+        }
+
         let result = services.auth.whoami(auth.token().unwrap()).await;
 
         match result {

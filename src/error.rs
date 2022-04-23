@@ -1,12 +1,12 @@
 use async_graphql::{Enum, ErrorExtensions};
 use regex::Regex;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::graphql::relay::Base64CursorError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Copy, Clone, Debug, Enum, Eq, thiserror::Error, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Enum, Eq, thiserror::Error, PartialEq, Serialize)]
 pub enum ErrorCode {
     #[error("BASE64_CURSOR_ERROR")]
     Base64CursorError,

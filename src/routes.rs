@@ -1,5 +1,5 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
+use async_graphql_rocket::{GraphQLRequest, GraphQLResponse};
 use rocket::request::{FromRequest, Outcome};
 use rocket::response::content;
 use rocket::{Request, State};

@@ -16,10 +16,17 @@ pub struct PostCreate {
 
 impl PostCreate {
     pub async fn exec(ctx: &Context<'_>, content: String) -> Result<PostCreate> {
-        let auth = ctx.data::<AuthToken>().unwrap();
+        let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data::<Arc<Services>>().unwrap();
         let user = services.auth.whoami(auth.token().unwrap()).await?;
         let result = services.post.create(user, content.as_str()).await;
+
+        if auth.token().is_none() {
+            return Ok(PostCreate {
+                post: None,
+                error: Some(PostError::unathorized()),
+            });
+        }
 
         match result {
             Ok(post) => Ok(PostCreate {
