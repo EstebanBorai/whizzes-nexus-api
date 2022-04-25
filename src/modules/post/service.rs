@@ -28,8 +28,6 @@ impl PostService {
             )
             .await?;
 
-        println!("{:?}", inserted);
-
         Ok(inserted)
     }
 
