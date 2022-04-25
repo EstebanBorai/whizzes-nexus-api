@@ -39,8 +39,8 @@ impl PostRepository {
         let conn = self.database.conn_pool.get()?;
         let dto = InsertPostTableRow {
             content: dto.content.to_string(),
-            scope: dto.scope.to_string(),
-            user_id: Some(user.id.clone()),
+            scope: dto.scope,
+            user_id: Some(user.id),
         };
         let row = diesel::insert_into(posts::table)
             .values(dto)
