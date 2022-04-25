@@ -27,6 +27,7 @@ impl PostService {
             .map(|post| Post {
                 id: post.id,
                 content: post.content,
+                scope: post.scope,
                 author: user.clone(),
                 created_at: post.created_at,
                 updated_at: post.updated_at,
