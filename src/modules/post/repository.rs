@@ -35,11 +35,11 @@ impl PostRepository {
         Self { database }
     }
 
-    pub async fn insert(&self, user: User, content: &str, scope: &str) -> Result<Post> {
+    pub async fn insert(&self, user: User, dto: InsertPostTableRow) -> Result<Post> {
         let conn = self.database.conn_pool.get()?;
         let dto = InsertPostTableRow {
-            content: content.to_string(),
-            scope: scope.to_string(),
+            content: dto.content.to_string(),
+            scope: dto.scope.to_string(),
             user_id: user.id.clone(),
         };
         let row = diesel::insert_into(posts::table)
