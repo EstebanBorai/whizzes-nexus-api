@@ -23,7 +23,7 @@ pub struct PostsTableRow {
 pub struct InsertPostTableRow {
     pub content: String,
     pub scope: String,
-    pub user_id: Uuid,
+    pub user_id: Option<Uuid>,
 }
 
 pub struct PostRepository {
@@ -40,7 +40,7 @@ impl PostRepository {
         let dto = InsertPostTableRow {
             content: dto.content.to_string(),
             scope: dto.scope.to_string(),
-            user_id: user.id.clone(),
+            user_id: Some(user.id.clone()),
         };
         let row = diesel::insert_into(posts::table)
             .values(dto)

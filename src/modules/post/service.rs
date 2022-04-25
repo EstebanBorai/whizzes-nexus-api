@@ -4,7 +4,7 @@ use crate::error::Result;
 use crate::modules::post::graphql::post_create::PostCreateInput;
 use crate::modules::user::User;
 
-use super::{Post, PostRepository};
+use super::{InsertPostTableRow, Post, PostRepository};
 
 pub struct PostService {
     repository: Arc<PostRepository>,
@@ -16,7 +16,19 @@ impl PostService {
     }
 
     pub async fn create(&self, user: User, payload: PostCreateInput) -> Result<Post> {
-        let inserted = self.repository.insert(user, payload).await?;
+        let inserted = self
+            .repository
+            .insert(
+                user,
+                InsertPostTableRow {
+                    content: payload.content,
+                    scope: payload.scope,
+                    user_id: None,
+                },
+            )
+            .await?;
+
+        println!("{:?}", inserted);
 
         Ok(inserted)
     }
