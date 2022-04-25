@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::error::Result;
+use crate::modules::post::graphql::post_create::PostCreateInput;
 use crate::modules::user::User;
 
 use super::{Post, PostRepository};
@@ -14,8 +15,8 @@ impl PostService {
         Self { repository }
     }
 
-    pub async fn create(&self, user: User, content: &str) -> Result<Post> {
-        let inserted = self.repository.insert(user, content).await?;
+    pub async fn create(&self, user: User, payload: PostCreateInput) -> Result<Post> {
+        let inserted = self.repository.insert(user, payload).await?;
 
         Ok(inserted)
     }
