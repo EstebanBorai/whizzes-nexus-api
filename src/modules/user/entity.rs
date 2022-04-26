@@ -1,15 +1,13 @@
 use async_graphql::{Enum, SimpleObject};
 use chrono::{DateTime, Utc};
-use diesel::{AsExpression, FromSqlRow, Identifiable};
-use diesel::pg::Pg;
-use diesel::sql_types::Text;
-use diesel::types::{ToSql, FromSql};
+use diesel::{AsExpression, FromSqlRow};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(AsExpression, Copy, Clone, Debug, Deserialize, Enum, Eq, FromSqlRow, PartialEq, Serialize, SqlType)]
-#[postgres(type_name = "gender")]
-#[sql_type = "Text"]
+#[derive(
+    AsExpression, Copy, Clone, Debug, Deserialize, Enum, Eq, FromSqlRow, PartialEq, Serialize,
+)]
+#[sql_type = "crate::modules::user::repository::PgGender"]
 pub enum Gender {
     Female,
     Male,
@@ -22,48 +20,22 @@ impl From<&str> for Gender {
             "female" => Self::Female,
             "male" => Self::Male,
             "custom" => Self::Custom,
-            _ => panic!("{}", &format!("The value: {s} doesn't corresponds to a `Gender` variant."))
+            _ => panic!(
+                "{}",
+                &format!("The value: {s} doesn't corresponds to a `Gender` variant.")
+            ),
         }
     }
 }
 
-impl ToSql<Text, Pg> for Gender {
-    fn to_sql<W: std::io::Write>(&self, out: &mut diesel::serialize::Output<W, Pg>) -> diesel::serialize::Result {
-        let gender = format!("{:?}", self);
-
-        ToSql::<Text, Pg>::to_sql(&gender, out)
-    }
-}
-
-impl FromSql<Text, Pg> for Gender {
-    fn from_sql(bytes: Option<&<Pg as diesel::backend::Backend>::RawValue>) -> diesel::deserialize::Result<Self> {
-        FromSql::<Text, Pg>::from_sql(bytes)
-            .map(|&s| Gender::from)
-    }
-}
-
-#[derive(AsExpression, Copy, Clone, Debug, Deserialize, Enum, Eq, FromSqlRow, PartialEq, Serialize, SqlType)]
-#[postgres(type_name = "pronoun")]
-#[sql_type = "Text"]
+#[derive(
+    AsExpression, Copy, Clone, Debug, Deserialize, Enum, Eq, FromSqlRow, PartialEq, Serialize,
+)]
+#[sql_type = "crate::modules::user::repository::PgPronoun"]
 pub enum Pronoun {
     He,
     She,
     They,
-}
-
-impl ToSql<Text, Pg> for Pronoun {
-    fn to_sql<W: std::io::Write>(&self, out: &mut diesel::serialize::Output<W, Pg>) -> diesel::serialize::Result {
-        let pronoun = format!("{:?}", self);
-
-        ToSql::<Text, Pg>::to_sql(&pronoun, out)
-    }
-}
-
-impl FromSql<Text, Pg> for Pronoun {
-    fn from_sql(bytes: Option<&<Pg as diesel::backend::Backend>::RawValue>) -> diesel::deserialize::Result<Self> {
-        FromSql::<Text, Pg>::from_sql(bytes)
-            .map(|&s| Pronoun::from)
-    }
 }
 
 impl From<&str> for Pronoun {
@@ -72,7 +44,10 @@ impl From<&str> for Pronoun {
             "he" => Self::He,
             "she" => Self::She,
             "they" => Self::They,
-            _ => panic!("{}", &format!("The value: {s} doesn't corresponds to a `Pronoun` variant."))
+            _ => panic!(
+                "{}",
+                &format!("The value: {s} doesn't corresponds to a `Pronoun` variant.")
+            ),
         }
     }
 }

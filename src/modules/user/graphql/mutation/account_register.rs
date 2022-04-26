@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::error::{Error, ErrorCode, Result};
-use crate::modules::user::{User, Gender, Pronoun};
+use crate::modules::user::{Gender, Pronoun, User};
 use crate::services::Services;
 
 #[derive(Debug, Deserialize, Serialize, SimpleObject)]

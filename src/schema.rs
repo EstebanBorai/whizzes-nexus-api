@@ -1,6 +1,6 @@
 table! {
     use diesel::sql_types::*;
-    use crate::modules::user::entity::{Gender, Pronoun};
+    use crate::modules::user::repository::{PgGender, PgPronoun};
 
     posts (id) {
         id -> Uuid,
@@ -13,7 +13,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::modules::user::entity::{Gender, Pronoun};
+    use crate::modules::user::repository::{PgGender, PgPronoun};
 
     users (id) {
         id -> Uuid,
@@ -25,15 +25,12 @@ table! {
         birthdate -> Timestamptz,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
-        gender -> Nullable<Gender>,
-        pronoun -> Nullable<Pronoun>,
+        gender -> Nullable<PgGender>,
+        pronoun -> Nullable<PgPronoun>,
         gender_name -> Nullable<Varchar>,
     }
 }
 
 joinable!(posts -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    posts,
-    users,
-);
+allow_tables_to_appear_in_same_query!(posts, users,);
