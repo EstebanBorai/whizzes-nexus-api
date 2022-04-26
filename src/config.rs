@@ -60,17 +60,8 @@ mod tests {
     use super::Config;
 
     #[test]
-    fn it_loads_port_from_environment_variable() {
-        env::set_var("PORT", "7878");
-
-        let config = Config::new();
-
-        assert_eq!(config.port, 7878);
-    }
-
-    #[test]
-    #[should_panic(expected = "Missing environment variable: PORT: NotPresent")]
-    fn it_panics_if_env_variable_not_present() {
+    #[should_panic(expected = "Missing environment variable: PORT")]
+    fn panics_if_env_variable_not_present() {
         env::remove_var("PORT");
 
         Config::new();
@@ -78,7 +69,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "Failed to parse environment variable value from key: PORT")]
-    fn it_panics_if_env_variable_couldnt_be_parsed() {
+    fn panics_if_env_variable_couldnt_be_parsed() {
         env::set_var("PORT", "NOT_A_NUMBER");
 
         Config::new();

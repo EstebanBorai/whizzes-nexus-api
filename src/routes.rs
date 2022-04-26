@@ -19,6 +19,24 @@ impl AuthToken {
         }
     }
 
+    pub fn from_header(value: &str) -> Self {
+        let parts = value.split(' ').collect::<Vec<&str>>();
+
+        if parts.len() != 2 {
+            return Self::empty();
+        }
+
+        if let Some(scheme) = parts.get(0) {
+            let token = *parts.get(1).unwrap();
+
+            if (*scheme) == "JWT" && !token.is_empty() {
+                return Self::new(token);
+            }
+        }
+
+        Self::empty()
+    }
+
     pub fn empty() -> Self {
         Self { token: None }
     }
@@ -36,7 +54,7 @@ impl<'r> FromRequest<'r> for AuthToken {
         let authorization_header = request.headers().get_one("Authorization");
 
         if let Some(auth_header_value) = authorization_header {
-            let auth_token = AuthToken::new(auth_header_value);
+            let auth_token = AuthToken::from_header(auth_header_value);
 
             return Outcome::Success(auth_token);
         }
@@ -62,4 +80,41 @@ pub async fn graphql_request(
     auth: AuthToken,
 ) -> GraphQLResponse {
     request.data(auth).execute(schema).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::AuthToken;
+
+    #[test]
+    fn token_from_auth_header() {
+        let auth_header = "JWT MyCoolToken";
+        let auth_token = AuthToken::from_header(auth_header);
+
+        assert_eq!(auth_token.token, Some(String::from("MyCoolToken")));
+    }
+
+    #[test]
+    fn token_is_none_on_invalid_scheme() {
+        let auth_header = "Bearer MyCoolToken";
+        let auth_token = AuthToken::from_header(auth_header);
+
+        assert_eq!(auth_token.token, None);
+    }
+
+    #[test]
+    fn token_is_none_on_invalid_header_value() {
+        let auth_header = "MyCoolToken";
+        let auth_token = AuthToken::from_header(auth_header);
+
+        assert_eq!(auth_token.token, None);
+    }
+
+    #[test]
+    fn token_is_none_on_empty_string() {
+        let auth_header = "";
+        let auth_token = AuthToken::from_header(auth_header);
+
+        assert_eq!(auth_token.token, None);
+    }
 }
