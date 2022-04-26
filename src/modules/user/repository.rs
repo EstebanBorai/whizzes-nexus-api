@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use diesel::Identifiable;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
@@ -9,10 +10,9 @@ use crate::database::Database;
 use crate::error::Result;
 use crate::schema::users;
 
-use super::entity::User;
+use super::entity::{Gender, Pronoun, User};
 
-#[derive(Debug, Deserialize, Insertable, Queryable, Serialize)]
-#[table_name = "users"]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
 pub struct UsersTableRow {
     pub id: Uuid,
     pub name: String,
@@ -20,6 +20,9 @@ pub struct UsersTableRow {
     pub email: String,
     pub username: String,
     pub password_hash: String,
+    pub gender: Option<Gender>,
+    pub pronoun: Option<Pronoun>,
+    pub gender_name: Option<String>,
     pub birthdate: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -34,6 +37,9 @@ impl From<UsersTableRow> for User {
             email: dto.email,
             username: dto.username,
             password_hash: dto.password_hash,
+            gender: dto.gender,
+            pronoun: dto.pronoun,
+            gender_name: dto.gender_name,
             birthdate: dto.birthdate,
             created_at: dto.created_at,
             updated_at: dto.updated_at,
@@ -50,6 +56,9 @@ pub struct InsertUserTableRow {
     pub username: String,
     pub password_hash: String,
     pub birthdate: DateTime<Utc>,
+    pub gender: Option<Gender>,
+    pub pronoun: Option<Pronoun>,
+    pub gender_name: Option<String>,
 }
 
 pub struct UserRepository {

@@ -3,3 +3,7 @@
 
 [print_schema]
 file = "src/schema.rs"
+import_types = [
+  "diesel::sql_types::*",
+  "crate::modules::user::entity::{Gender, Pronoun}",
+]

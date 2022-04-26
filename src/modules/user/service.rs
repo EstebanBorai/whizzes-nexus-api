@@ -37,6 +37,9 @@ impl UserService {
                 email: payload.email,
                 username: payload.username,
                 password_hash,
+                gender: payload.gender,
+                pronoun: payload.pronoun,
+                gender_name: payload.gender_name,
                 birthdate: payload.birthdate,
             })
             .await?;
