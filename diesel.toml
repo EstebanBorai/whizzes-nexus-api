@@ -5,5 +5,5 @@
 file = "src/schema.rs"
 import_types = [
   "diesel::sql_types::*",
-  "crate::modules::user::repository::{PgGender, PgPronoun}",
+  "crate::modules::user::entity::{GenderMapping, PronounMapping}",
 ]

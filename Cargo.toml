@@ -12,6 +12,7 @@ base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenv = "0.15.0"
 diesel = { version = "1.4.8", features = ["chrono", "postgres", "r2d2", "uuidv07"] }
+diesel-derive-enum = { version = "1.1.2", features = ["postgres"] }
 jsonwebtoken = "8.0.1"
 r2d2 = "0.8.9"
 rand = "0.8.5"

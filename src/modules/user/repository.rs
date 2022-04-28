@@ -1,8 +1,5 @@
 use chrono::{DateTime, Utc};
-use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::sql_types::Text;
-use diesel::types::{FromSql, ToSql};
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -13,50 +10,6 @@ use crate::error::Result;
 use crate::schema::users;
 
 use super::entity::{Gender, Pronoun, User};
-
-/// Refer: https://github.com/diesel-rs/diesel/blob/d5ce11bdd58cbb39f5c93a50cf7342d7851217b0/diesel_tests/tests/custom_types.rs#L18
-#[derive(Debug, SqlType)]
-#[postgres(type_name = "gender")]
-pub struct PgGender;
-
-impl ToSql<PgGender, Pg> for Gender {
-    fn to_sql<W: std::io::Write>(
-        &self,
-        out: &mut diesel::serialize::Output<W, Pg>,
-    ) -> diesel::serialize::Result {
-        let gender = format!("{:?}", self);
-
-        ToSql::<Text, Pg>::to_sql(&gender, out)
-    }
-}
-
-impl FromSql<PgGender, Pg> for Gender {
-    fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
-        FromSql::<Text, Pg>::from_sql(bytes).map(|v: String| Gender::from(v.as_str()))
-    }
-}
-
-/// Refer: https://github.com/diesel-rs/diesel/blob/d5ce11bdd58cbb39f5c93a50cf7342d7851217b0/diesel_tests/tests/custom_types.rs#L18
-#[derive(Debug, SqlType)]
-#[postgres(type_name = "pronoun")]
-pub struct PgPronoun;
-
-impl ToSql<PgPronoun, Pg> for Pronoun {
-    fn to_sql<W: std::io::Write>(
-        &self,
-        out: &mut diesel::serialize::Output<W, Pg>,
-    ) -> diesel::serialize::Result {
-        let pronoun = format!("{:?}", self);
-
-        ToSql::<Text, Pg>::to_sql(&pronoun, out)
-    }
-}
-
-impl FromSql<PgPronoun, Pg> for Pronoun {
-    fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
-        FromSql::<Text, Pg>::from_sql(bytes).map(|v: String| Pronoun::from(v.as_str()))
-    }
-}
 
 #[derive(Debug, Deserialize, Queryable, Serialize)]
 pub struct UsersTableRow {

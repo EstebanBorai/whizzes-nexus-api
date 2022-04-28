@@ -22,14 +22,11 @@ use self::graphql::{Mutation, Query, Schema};
 use self::routes::{cors_preflight, graphql_playground, graphql_request};
 use self::services::Services;
 
-/// A single `Result` type to narrow error handling and expose the error to
-/// the client.
-///
-/// Any `struct` that implements `std::fmt::Display` or the `std::error::Error`
-/// trait is compatible with the error wrapped by this `Result`.
-/// pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 #[macro_use]
 extern crate diesel;
+
+#[macro_use]
+extern crate diesel_derive_enum ;
 
 #[rocket::launch]
 async fn rocket() -> _ {
