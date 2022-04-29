@@ -1,0 +1,16 @@
+name: Migrations
+
+ on:
+   workflow_dispatch:
+
+ jobs:
+   build:
+     runs-on: macos-latest
+     env:
+       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+     steps:
+       - name: Checkout project files
+         uses: actions/checkout@v2
+
+       - name: Run migrationos
+         run: ./bin/sqlx-cli migrate run
