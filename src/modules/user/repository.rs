@@ -1,18 +1,17 @@
 use chrono::{DateTime, Utc};
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
+use sqlx::pool::Pool;
+use sqlx::{FromRow, Postgres};
 use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::database::Database;
 use crate::error::Result;
-use crate::schema::users;
 
 use super::entity::User;
+use super::{Gender, Pronoun};
 
-#[derive(Debug, Deserialize, Insertable, Queryable, Serialize)]
-#[table_name = "users"]
+#[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct UsersTableRow {
     pub id: Uuid,
     pub name: String,
@@ -20,6 +19,9 @@ pub struct UsersTableRow {
     pub email: String,
     pub username: String,
     pub password_hash: String,
+    pub gender: Gender,
+    pub pronoun: Pronoun,
+    pub custom_gender: Option<String>,
     pub birthdate: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -34,6 +36,9 @@ impl From<UsersTableRow> for User {
             email: dto.email,
             username: dto.username,
             password_hash: dto.password_hash,
+            gender: dto.gender,
+            pronoun: dto.pronoun,
+            custom_gender: dto.custom_gender,
             birthdate: dto.birthdate,
             created_at: dto.created_at,
             updated_at: dto.updated_at,
@@ -41,8 +46,7 @@ impl From<UsersTableRow> for User {
     }
 }
 
-#[derive(Debug, Deserialize, Insertable, Queryable, Serialize)]
-#[table_name = "users"]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct InsertUserTableRow {
     pub name: String,
     pub last_name: String,
@@ -50,6 +54,9 @@ pub struct InsertUserTableRow {
     pub username: String,
     pub password_hash: String,
     pub birthdate: DateTime<Utc>,
+    pub gender: Gender,
+    pub pronoun: Pronoun,
+    pub custom_gender: Option<String>,
 }
 
 pub struct UserRepository {
@@ -62,30 +69,60 @@ impl UserRepository {
     }
 
     pub async fn find_all(&self) -> Result<Vec<User>> {
-        let conn = self.database.conn_pool.get()?;
-        let users = users::table.load::<UsersTableRow>(&conn)?;
-        let users = users.into_iter().map(User::from).collect::<Vec<User>>();
+        let result: Vec<UsersTableRow> = sqlx::query_as("SELECT * FROM users")
+            .fetch_all(&self.database.conn_pool)
+            .await?;
+        let users = result.into_iter().map(User::from).collect::<Vec<User>>();
 
         Ok(users)
     }
 
     pub async fn find_by_username(&self, username: &str) -> Result<User> {
-        let conn = self.database.conn_pool.get()?;
-        let row = users::table
-            .filter(users::username.eq(username))
-            .limit(1)
-            .first::<UsersTableRow>(&conn)?;
+        let result: UsersTableRow = sqlx::query_as("SELECT * FROM users WHERE username = $1")
+            .bind(username)
+            .fetch_one::<&Pool<Postgres>>(&self.database.conn_pool)
+            .await?;
 
-        Ok(User::from(row))
+        Ok(User::from(result))
     }
 
     pub async fn insert(&self, dto: InsertUserTableRow) -> Result<User> {
-        let conn = self.database.conn_pool.get()?;
-        let row = diesel::insert_into(users::table)
-            .values(dto)
-            .get_result::<UsersTableRow>(&conn)?;
-        let user = User::from(row);
+        let result: UsersTableRow = sqlx::query_as(
+            r#"
+            INSERT INTO users (
+                name,
+                last_name,
+                email,
+                username,
+                password_hash,
+                birthdate,
+                gender,
+                pronoun,
+                custom_gender
+            ) VALUES (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7::gender,
+                $8::pronoun,
+                $9
+            ) RETURNING *"#,
+        )
+        .bind(dto.name)
+        .bind(dto.last_name)
+        .bind(dto.email)
+        .bind(dto.username)
+        .bind(dto.password_hash)
+        .bind(dto.birthdate)
+        .bind(dto.gender.to_string())
+        .bind(dto.pronoun.to_string())
+        .bind(dto.custom_gender)
+        .fetch_one(&self.database.conn_pool)
+        .await?;
 
-        Ok(user)
+        Ok(User::from(result))
     }
 }

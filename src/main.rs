@@ -7,7 +7,6 @@ mod graphql;
 mod modules;
 mod responders;
 mod routes;
-mod schema;
 mod services;
 
 use async_graphql::EmptySubscription;
@@ -22,15 +21,6 @@ use self::graphql::{Mutation, Query, Schema};
 use self::routes::{cors_preflight, graphql_playground, graphql_request};
 use self::services::Services;
 
-/// A single `Result` type to narrow error handling and expose the error to
-/// the client.
-///
-/// Any `struct` that implements `std::fmt::Display` or the `std::error::Error`
-/// trait is compatible with the error wrapped by this `Result`.
-/// pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
-#[macro_use]
-extern crate diesel;
-
 #[rocket::launch]
 async fn rocket() -> _ {
     env::set_var("RUST_BACKTRACE", "1");
@@ -40,7 +30,7 @@ async fn rocket() -> _ {
     }
 
     let config = Config::new();
-    let database = Database::new(&config);
+    let database = Database::new(&config).await;
     let services = Services::new(&config, database);
     let services = Arc::new(services);
     let graphql_schema = Schema::build(Query::default(), Mutation::default(), EmptySubscription)

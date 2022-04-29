@@ -11,9 +11,8 @@ async-graphql-rocket = "3.0.15"
 base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenv = "0.15.0"
-diesel = { version = "1.4.4", features = ["chrono", "postgres", "r2d2", "uuidv07"] }
+sqlx = { version = "0.5", features = [ "chrono", "postgres", "runtime-tokio-rustls", "uuid" ] }
 jsonwebtoken = "8.0.1"
-r2d2 = "0.8.9"
 rand = "0.8.5"
 regex = "1.5.5"
 rocket = { version = "0.5.0-rc.1", features = ["json"] }

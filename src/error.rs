@@ -1,5 +1,4 @@
 use async_graphql::{Enum, ErrorExtensions};
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use crate::graphql::relay::Base64CursorError;
@@ -97,35 +96,8 @@ impl From<Error> for async_graphql::Error {
     }
 }
 
-impl From<diesel::result::Error> for Error {
-    fn from(err: diesel::result::Error) -> Self {
-        use diesel::result::Error;
-
-        if let Error::DatabaseError(kind, info) = &err {
-            return match kind {
-                diesel::result::DatabaseErrorKind::UniqueViolation => {
-                    // Here the whole message from SQL is retrieved:
-                    //
-                    // duplicate key value violates unique constraint "users_email_key"
-                    //
-                    // and `info.column_name` retrieves `None`. As a workaround
-                    // the constraint name is taken from the message and used
-                    // as hint
-                    //
-                    // Key (username)=(esteban) already exists.
-                    // (?:\w*)(?:\()(\w*)*(?:\))
-                    let re = Regex::new(r"(?:\w*)(?:\()(\w*)*(?:\))").unwrap();
-                    let captures = re.captures(info.details().unwrap()).unwrap();
-                    println!("{:?}", captures);
-                    Self::unique(
-                        captures.get(0).unwrap().as_str(),
-                        Some(captures.get(1).unwrap().as_str()),
-                    )
-                }
-                _ => Self::unhandled(Box::new(err)),
-            };
-        }
-
+impl From<sqlx::error::Error> for Error {
+    fn from(err: sqlx::error::Error) -> Self {
         Self::unhandled(Box::new(err))
     }
 }
@@ -138,12 +110,6 @@ impl From<jsonwebtoken::errors::Error> for Error {
             ErrorKind::InvalidToken => Error::code(ErrorCode::InvalidJsonWebToken),
             _ => Error::unhandled(Box::new(err)),
         }
-    }
-}
-
-impl From<r2d2::Error> for Error {
-    fn from(_: r2d2::Error) -> Self {
-        Error::code(ErrorCode::ServerError)
     }
 }
 
