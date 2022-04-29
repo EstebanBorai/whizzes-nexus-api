@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::error::{Error, ErrorCode, Result};
-use crate::modules::user::User;
+use crate::modules::user::{Gender, Pronoun, User};
 use crate::services::Services;
 
 #[derive(Debug, Deserialize, Serialize, SimpleObject)]
@@ -52,6 +52,9 @@ pub struct AccountRegisterInput {
     pub username: String,
     pub password: String,
     pub birthdate: DateTime<Utc>,
+    pub gender: Gender,
+    pub pronoun: Pronoun,
+    pub custom_gender: Option<String>,
 }
 
 pub async fn exec(ctx: &Context<'_>, input: AccountRegisterInput) -> Result<AccountRegister> {

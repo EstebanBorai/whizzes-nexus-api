@@ -1,6 +1,4 @@
 use chrono::{DateTime, Utc};
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -8,12 +6,9 @@ use uuid::Uuid;
 use crate::database::Database;
 use crate::error::Result;
 use crate::modules::user::User;
-use crate::schema::posts;
 
 use super::entity::Post;
 
-#[derive(Debug, Deserialize, Insertable, Queryable, Serialize)]
-#[table_name = "posts"]
 pub struct PostsTableRow {
     pub id: Uuid,
     pub user_id: Uuid,

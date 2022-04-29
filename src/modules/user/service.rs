@@ -36,6 +36,9 @@ impl UserService {
                 last_name: payload.last_name,
                 email: payload.email,
                 username: payload.username,
+                gender: payload.gender,
+                pronoun: payload.pronoun,
+                custom_gender: payload.custom_gender,
                 password_hash,
                 birthdate: payload.birthdate,
             })
