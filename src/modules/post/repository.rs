@@ -2,20 +2,21 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use std::sync::Arc;
-use uuid::Uuid;
+use uuid::{self, Uuid};
 
 use crate::database::Database;
 use crate::error::Result;
 use crate::modules::user::User;
 
 use super::entity::Post;
+use super::Scope;
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct PostsTableRow {
     pub id: Uuid,
     pub user_id: Uuid,
     pub content: String,
-    pub scope: String,
+    pub scope: Scope,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -23,7 +24,7 @@ pub struct PostsTableRow {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct InsertPostTableRow {
     pub content: String,
-    pub scope: String,
+    pub scope: Scope,
     pub user_id: Option<Uuid>,
 }
 
@@ -58,18 +59,18 @@ impl PostRepository {
     pub async fn insert(&self, user: User, dto: InsertPostTableRow) -> Result<Post> {
         let result: PostsTableRow = sqlx::query_as(
             r#"
-                INSERT INTO posts (
-                    content,
-                    scope,
-                    user_id,
-                ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                ) RETURNING *"#,
+            INSERT INTO posts (
+                content,
+                scope,
+                user_id,
+            ) VALUES (
+                $1,
+                $2::scope,
+                $3,
+            ) RETURNING *"#,
         )
         .bind(dto.content)
-        .bind(dto.scope)
+        .bind(dto.scope.to_string())
         .bind(dto.user_id)
         .fetch_one(&self.database.conn_pool)
         .await?;

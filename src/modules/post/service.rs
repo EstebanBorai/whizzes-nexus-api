@@ -22,7 +22,7 @@ impl PostService {
                 user,
                 InsertPostTableRow {
                     content: payload.content,
-                    scope: payload.scope.to_lowercase(),
+                    scope: payload.scope,
                     user_id: None,
                 },
             )

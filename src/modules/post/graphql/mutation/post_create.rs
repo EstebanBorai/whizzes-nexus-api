@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::error::Result;
 use crate::modules::post::graphql::PostError;
-use crate::modules::post::Post;
+use crate::modules::post::{Post, Scope};
 use crate::routes::AuthToken;
 use crate::services::Services;
 
@@ -18,7 +18,7 @@ pub struct PostCreate {
 #[graphql(input_name = "PostCreateInput")]
 pub struct PostCreateInput {
     pub content: String,
-    pub scope: String,
+    pub scope: Scope,
 }
 
 impl PostCreate {
