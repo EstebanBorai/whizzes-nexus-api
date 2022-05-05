@@ -62,16 +62,16 @@ impl PostRepository {
             INSERT INTO posts (
                 content,
                 scope,
-                user_id,
+                user_id
             ) VALUES (
                 $1,
                 $2::scope,
-                $3,
+                $3
             ) RETURNING *"#,
         )
         .bind(dto.content)
         .bind(dto.scope.to_string())
-        .bind(dto.user_id)
+        .bind(user.id)
         .fetch_one(&self.database.conn_pool)
         .await?;
 
