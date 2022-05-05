@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Copy, Clone, Debug, Deserialize, Enum, PartialEq, Eq, Serialize, sqlx::Type)]
+#[sqlx(rename_all = "lowercase")]
 pub enum Gender {
     Female,
     Male,
@@ -21,6 +22,7 @@ impl ToString for Gender {
 }
 
 #[derive(Copy, Clone, Debug, Deserialize, Enum, PartialEq, Eq, Serialize, sqlx::Type)]
+#[sqlx(rename_all = "lowercase")]
 pub enum Pronoun {
     He,
     She,
