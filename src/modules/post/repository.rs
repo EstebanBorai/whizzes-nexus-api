@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::poll::Poll;
-use sqlx::{FromRow, Postgres};
+use sqlx::FromRow;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -21,20 +20,7 @@ pub struct PostsTableRow {
     pub updated_at: DateTime<Utc>,
 }
 
-impl From<PostsTableRow> for Post {
-    fn from(row: PostsTableRow) -> Self {
-        Post {
-            id: row.id,
-            user_id: row.user_id,
-            content: row.content,
-            scope: row.scope,
-            created_at: row.created_at,
-            updated_at: row.updated_at,
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Insertable, Queryable, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct InsertPostTableRow {
     pub content: String,
     pub scope: String,
@@ -48,6 +34,25 @@ pub struct PostRepository {
 impl PostRepository {
     pub fn new(database: Arc<Database>) -> Self {
         Self { database }
+    }
+
+    pub async fn find_by_author(&self, author_id: &Uuid) -> Result<Vec<PostsTableRow>> {
+        let result: Vec<PostsTableRow> = sqlx::query_as("SELECT * FROM posts WHERE user_id = $1")
+            .bind(author_id)
+            .fetch_all(&self.database.conn_pool)
+            .await?;
+        let posts = result
+            .into_iter()
+            .map(|row| PostsTableRow {
+                id: row.id,
+                user_id: row.user_id,
+                content: row.content,
+                scope: row.scope,
+                created_at: row.created_at,
+                updated_at: row.updated_at,
+            })
+            .collect::<Vec<PostsTableRow>>();
+        Ok(posts)
     }
 
     pub async fn insert(&self, user: User, dto: InsertPostTableRow) -> Result<Post> {
@@ -69,15 +74,13 @@ impl PostRepository {
         .fetch_one(&self.database.conn_pool)
         .await?;
 
-        Ok(Post::from(result))
-    }
-
-    pub async fn find_by_author(&self, author_id: &Uuid) -> Result<Vec<PostsTableRow>> {
-        let conn = self.database.conn_pool.get()?;
-        let posts = posts::table
-            .filter(posts::user_id.eq(author_id))
-            .load::<PostsTableRow>(&conn)?;
-
-        Ok(posts)
+        Ok(Post {
+            id: result.id,
+            content: result.content,
+            scope: result.scope,
+            author: user,
+            created_at: result.created_at,
+            updated_at: result.updated_at,
+        })
     }
 }

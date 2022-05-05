@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::modules::user::User;
 
-#[derive(Debug, Deserialize, Serialize, SimpleObject)]
+#[derive(Clone, Debug, Deserialize, Serialize, SimpleObject)]
 pub struct Post {
     pub id: Uuid,
     pub content: String,
