@@ -5,8 +5,11 @@
 
 <div align="center">
 
-![Build](https://github.com/whizzbit/nexus-server/workflows/build/badge.svg)
-![Lint](https://github.com/whizzbit/nexus-server/workflows/fmt/badge.svg)
+![Build](https://github.com/whizzbit/nexus-api/workflows/build/badge.svg)
+![Clippy](https://github.com/whizzbit/nexus-api/workflows/clippy/badge.svg)
+![Deploy](https://github.com/whizzbit/nexus-api/workflows/deploy/badge.svg)
+![Fmt](https://github.com/whizzbit/nexus-api/workflows/fmt/badge.svg)
+![Test](https://github.com/whizzbit/nexus-api/workflows/test/badge.svg)
 
 </div>
 
@@ -22,21 +25,30 @@ This application is published to a Heroku Dyno instance using the
 ## Requirements
 
 - Rust and Cargo ([Rustup](https://rustup.rs))
-- [Diesel CLI](#install-diesel-cli)
+- [SQLx CLI](#setup-sqlx-for-database-migrations)
 
 ## Getting Started
 
 1. Clone this repository
 
 ```bash
-git clone https://github.com/whizzbit/nexus-server.git
+git clone https://github.com/whizzbit/nexus-api.git
 ```
 
 2. Create a copy of `.env.sample` in a new file with the name: `.env`
 
-3. Execute Docker containers running `docker-compose up`
+```bash
+cp ./.env.sample ./.env
+```
 
-4. Run database migrations running `diesel migration run`. [You must complete Diesel Setup First](#install-diesel-cli).
+3. Execute Docker containers:
+
+
+```bash
+docker compose up
+```
+
+4. Run database migrations running `sqlx migrate run`. [You must complete SQLx Setup First](#setup-sqlx-for-database-migrations).
 
 5. Open a new terminal session and run the server
 
@@ -44,39 +56,12 @@ git clone https://github.com/whizzbit/nexus-server.git
 cargo run
 ```
 
-## Install Diesel CLI
+## Setup SQLx for Database Migrations
 
-This project uses Diesel ORM to perform database related operations.
-
-It's recommended to install the Diesel CLI binary using `cargo install`
-to use this project.
-
-1. Install `libpq`
-
-1.1. (macOS) Install `libpq` using Homebrew
+Install SQLx CLI using `cargo install` for PostgreSQL only
 
 ```bash
-brew install libpq
-```
-
-1.2. (Ubuntu/Linux) Install `libpq` using `apt-get`
-
-```bash
-sudo apt-get update && sudo apt-get install libpq-dev
-```
-
-> [Issues? Perhaps this StackExchange question may help][4].
-
-2. The add the library to your PATH
-
-```bash
-echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.zshrc
-```
-
-3. Finally install Diesel CLI
-
-```bash
-cargo install diesel_cli --no-default-features --features "postgres"
+cargo install sqlx-cli --no-default-features --features native-tls,postgres
 ```
 
 ## GraphQL
