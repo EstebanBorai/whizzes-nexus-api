@@ -117,8 +117,8 @@ impl UserRepository {
         .bind(dto.username)
         .bind(dto.password_hash)
         .bind(dto.birthdate)
-        .bind(dto.gender.to_string())
-        .bind(dto.pronoun.to_string())
+        .bind(dto.gender)
+        .bind(dto.pronoun)
         .bind(dto.custom_gender)
         .fetch_one(&self.database.conn_pool)
         .await?;
