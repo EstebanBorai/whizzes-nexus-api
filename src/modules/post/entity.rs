@@ -25,7 +25,7 @@ impl ToString for Scope {
 pub struct Post {
     pub id: Uuid,
     pub content: String,
-    pub author: User,
+    pub user_id: Uuid,
     pub scope: Scope,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,

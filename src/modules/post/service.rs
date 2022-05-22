@@ -39,7 +39,7 @@ impl PostService {
                 id: post.id,
                 content: post.content,
                 scope: post.scope,
-                author: user.clone(),
+                user_id: user.id,
                 created_at: post.created_at,
                 updated_at: post.updated_at,
             })

@@ -21,6 +21,19 @@ pub struct PostsTableRow {
     pub updated_at: DateTime<Utc>,
 }
 
+impl From<PostsTableRow> for Post {
+    fn from(dto: PostsTableRow) -> Self {
+        Self {
+            id: dto.id,
+            user_id: dto.user_id,
+            content: dto.content,
+            scope: dto.scope,
+            created_at: dto.created_at,
+            updated_at: dto.updated_at,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct InsertPostTableRow {
     pub content: String,
@@ -37,14 +50,14 @@ impl PostRepository {
         Self { database }
     }
 
-    pub async fn find_by_author(&self, author_id: &Uuid) -> Result<Vec<PostsTableRow>> {
+    pub async fn find_by_author(&self, user_id: &Uuid) -> Result<Vec<Post>> {
         let result: Vec<PostsTableRow> = sqlx::query_as("SELECT * FROM posts WHERE user_id = $1")
-            .bind(author_id)
+            .bind(user_id)
             .fetch_all(&self.database.conn_pool)
             .await?;
         let posts = result
             .into_iter()
-            .map(|row| PostsTableRow {
+            .map(|row| Post {
                 id: row.id,
                 user_id: row.user_id,
                 content: row.content,
@@ -52,7 +65,8 @@ impl PostRepository {
                 created_at: row.created_at,
                 updated_at: row.updated_at,
             })
-            .collect::<Vec<PostsTableRow>>();
+            .collect::<Vec<Post>>();
+
         Ok(posts)
     }
 
@@ -70,7 +84,7 @@ impl PostRepository {
             ) RETURNING *"#,
         )
         .bind(dto.content)
-        .bind(dto.scope.to_string())
+        .bind(dto.scope)
         .bind(user.id)
         .fetch_one(&self.database.conn_pool)
         .await?;
@@ -79,7 +93,7 @@ impl PostRepository {
             id: result.id,
             content: result.content,
             scope: result.scope,
-            author: user,
+            user_id: user.id,
             created_at: result.created_at,
             updated_at: result.updated_at,
         })
