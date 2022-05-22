@@ -25,12 +25,7 @@ impl Users {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data_unchecked::<Arc<Services>>();
 
-        if auth.token().is_none() {
-            return Ok(Users {
-                users: None,
-                error: Some(UserError::unathorized()),
-            });
-        }
+        auth.token()?;
 
         let result = services.user.find_all().await;
 

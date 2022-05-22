@@ -25,15 +25,9 @@ impl PostCreate {
     pub async fn exec(ctx: &Context<'_>, input: PostCreateInput) -> Result<PostCreate> {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data::<Arc<Services>>().unwrap();
-        let user = services.auth.whoami(auth.token().unwrap()).await?;
+        let token = auth.token()?;
+        let user = services.auth.whoami(token).await?;
         let result = services.post.create(user, input).await;
-
-        if auth.token().is_none() {
-            return Ok(PostCreate {
-                post: None,
-                error: Some(PostError::unathorized()),
-            });
-        }
 
         match result {
             Ok(post) => Ok(PostCreate {

@@ -18,15 +18,8 @@ impl Me {
     pub async fn exec(ctx: &Context<'_>) -> Result<Self> {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data_unchecked::<Arc<Services>>();
-
-        if auth.token().is_none() {
-            return Ok(Me {
-                me: None,
-                error: Some(UserError::unathorized()),
-            });
-        }
-
-        let result = services.auth.whoami(auth.token().unwrap()).await;
+        let token = auth.token()?;
+        let result = services.auth.whoami(token).await;
 
         match result {
             Ok(user) => Ok(Me {

@@ -23,16 +23,9 @@ impl Posts {
         last: Option<i32>,
     ) -> Result<Self> {
         let auth = ctx.data_unchecked::<AuthToken>();
-
-        if auth.token().is_none() {
-            return Ok(Posts {
-                posts: None,
-                error: Some(PostError::unathorized()),
-            });
-        }
-
+        let token = auth.token()?;
         let services = ctx.data::<Arc<Services>>().unwrap();
-        let user = services.auth.whoami(auth.token().unwrap()).await?;
+        let user = services.auth.whoami(token).await?;
         let result = services.post.find_by_author(user).await;
 
         match result {

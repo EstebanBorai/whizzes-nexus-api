@@ -4,6 +4,7 @@ use rocket::request::{FromRequest, Outcome};
 use rocket::response::content;
 use rocket::{Request, State};
 
+use crate::error::{Error, Result};
 use crate::graphql::Schema;
 use crate::responders::cors::{Cors, CorsPreflight};
 
@@ -41,8 +42,12 @@ impl AuthToken {
         Self { token: None }
     }
 
-    pub fn token(&self) -> Option<String> {
-        self.token.clone()
+    pub fn token(&self) -> Result<String> {
+        if let Some(token) = &self.token {
+            return Ok(token.to_string());
+        }
+
+        Err(Error::unauthorized())
     }
 }
 

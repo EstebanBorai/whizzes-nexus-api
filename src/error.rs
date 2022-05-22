@@ -15,6 +15,8 @@ pub enum ErrorCode {
     InvalidCredentials,
     #[error("INVALID_JWT")]
     InvalidJsonWebToken,
+    #[error("UNAUTHORIZED")]
+    Unauthorized,
     #[error("UNIQUE")]
     Unique,
     #[error("UNHANDLED")]
@@ -71,9 +73,17 @@ impl Error {
 
     pub fn unhandled(err: Box<dyn std::error::Error + Send + Sync>) -> Self {
         Self {
-            field: Some(String::from("An unhandled erorr ocurred")),
+            field: Some(String::from("An unhandled error ocurred")),
             message: Some(err.to_string()),
             code: ErrorCode::Unhandled,
+        }
+    }
+
+    pub fn unauthorized() -> Self {
+        Self {
+            field: None,
+            message: Some(String::from("Missing access token")),
+            code: ErrorCode::Unauthorized,
         }
     }
 }
