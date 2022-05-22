@@ -1,10 +1,10 @@
-use async_graphql::{Context, SimpleObject};
+use async_graphql::{Context, InputObject, SimpleObject};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::error::Result;
 use crate::modules::post::graphql::PostError;
-use crate::modules::post::Post;
+use crate::modules::post::{Post, Scope};
 use crate::routes::AuthToken;
 use crate::services::Services;
 
@@ -14,12 +14,19 @@ pub struct PostCreate {
     error: Option<PostError>,
 }
 
+#[derive(Deserialize, Serialize, InputObject)]
+#[graphql(input_name = "PostCreateInput")]
+pub struct PostCreateInput {
+    pub content: String,
+    pub scope: Scope,
+}
+
 impl PostCreate {
-    pub async fn exec(ctx: &Context<'_>, content: String) -> Result<PostCreate> {
+    pub async fn exec(ctx: &Context<'_>, input: PostCreateInput) -> Result<PostCreate> {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data::<Arc<Services>>().unwrap();
         let user = services.auth.whoami(auth.token().unwrap()).await?;
-        let result = services.post.create(user, content.as_str()).await;
+        let result = services.post.create(user, input).await;
 
         if auth.token().is_none() {
             return Ok(PostCreate {
