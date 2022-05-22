@@ -6,6 +6,7 @@ use rocket::{Request, State};
 
 use crate::error::{Error, Result};
 use crate::graphql::Schema;
+use crate::modules::auth;
 use crate::responders::cors::{Cors, CorsPreflight};
 
 #[derive(Debug)]

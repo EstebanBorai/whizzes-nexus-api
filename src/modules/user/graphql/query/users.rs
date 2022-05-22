@@ -24,12 +24,11 @@ impl Users {
     ) -> Result<Users> {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data_unchecked::<Arc<Services>>();
+        let token = auth.token()?;
 
-        auth.token()?;
+        services.auth.whoami(token).await?;
 
-        let result = services.user.find_all().await;
-
-        match result {
+        match services.user.find_all().await {
             Ok(users) => {
                 let users_connection = relay::query(
                     users.into_iter(),

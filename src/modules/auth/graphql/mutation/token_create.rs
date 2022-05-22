@@ -45,10 +45,9 @@ impl TokenCreate {
         username: String,
         password: String,
     ) -> Result<TokenCreate> {
-        let services = ctx.data::<Arc<Services>>().unwrap();
-        let result = services.auth.create_token(username, password).await;
+        let services = ctx.data_unchecked::<Arc<Services>>();
 
-        match result {
+        match services.auth.create_token(username, password).await {
             Ok(tokens) => Ok(TokenCreate {
                 tokens: Some(tokens),
                 error: None,

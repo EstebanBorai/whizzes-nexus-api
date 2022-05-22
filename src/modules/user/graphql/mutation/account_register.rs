@@ -58,10 +58,9 @@ pub struct AccountRegisterInput {
 }
 
 pub async fn exec(ctx: &Context<'_>, input: AccountRegisterInput) -> Result<AccountRegister> {
-    let services = ctx.data::<Arc<Services>>().unwrap();
-    let result = services.user.create(input).await;
+    let services = ctx.data_unchecked::<Arc<Services>>();
 
-    match result {
+    match services.user.create(input).await {
         Ok(user) => Ok(AccountRegister {
             user: Some(user),
             error: None,

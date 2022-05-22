@@ -26,9 +26,8 @@ impl Posts {
         let token = auth.token()?;
         let services = ctx.data::<Arc<Services>>().unwrap();
         let user = services.auth.whoami(token).await?;
-        let result = services.post.find_by_author(user).await;
 
-        match result {
+        match services.post.find_by_author(user).await {
             Ok(posts) => {
                 let posts_connection = relay::query(
                     posts.into_iter(),

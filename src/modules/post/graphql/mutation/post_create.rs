@@ -27,9 +27,8 @@ impl PostCreate {
         let services = ctx.data::<Arc<Services>>().unwrap();
         let token = auth.token()?;
         let user = services.auth.whoami(token).await?;
-        let result = services.post.create(user, input).await;
 
-        match result {
+        match services.post.create(user, input).await {
             Ok(post) => Ok(PostCreate {
                 post: Some(post),
                 error: None,

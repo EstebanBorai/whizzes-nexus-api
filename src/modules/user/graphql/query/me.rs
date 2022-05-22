@@ -19,9 +19,8 @@ impl Me {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data_unchecked::<Arc<Services>>();
         let token = auth.token()?;
-        let result = services.auth.whoami(token).await;
 
-        match result {
+        match services.auth.whoami(token).await {
             Ok(user) => Ok(Me {
                 me: Some(user),
                 error: None,
