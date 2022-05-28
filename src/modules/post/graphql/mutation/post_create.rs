@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::error::Result;
-use crate::modules::post::graphql::PostError;
-use crate::modules::post::{Post, Scope};
+use crate::modules::post::graphql::{Post, PostError};
+use crate::modules::post::Scope;
 use crate::routes::AuthToken;
 use crate::services::Services;
 
@@ -28,9 +28,16 @@ impl PostCreate {
         let token = auth.token()?;
         let user = services.auth.whoami(token).await?;
 
-        match services.post.create(user, input).await {
+        match services.post.create(user.clone(), input).await {
             Ok(post) => Ok(PostCreate {
-                post: Some(post),
+                post: Some(Post {
+                    id: post.id,
+                    content: post.content,
+                    user,
+                    scope: post.scope,
+                    created_at: post.created_at,
+                    updated_at: post.updated_at,
+                }),
                 error: None,
             }),
             Err(err) => {

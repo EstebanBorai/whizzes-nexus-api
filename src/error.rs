@@ -23,7 +23,7 @@ pub enum ErrorCode {
     Unhandled,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Error {
     pub field: Option<String>,
     pub message: Option<String>,

@@ -1,7 +1,21 @@
 use async_graphql::{Enum, SimpleObject};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::error::{Error, ErrorCode};
+use crate::modules::post::Scope;
+use crate::modules::user::User;
+
+#[derive(Clone, Debug, Deserialize, Serialize, SimpleObject)]
+pub struct Post {
+    pub id: Uuid,
+    pub content: String,
+    pub user: User,
+    pub scope: Scope,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
 
 #[derive(Clone, Debug, Deserialize, Serialize, SimpleObject)]
 pub struct PostError {
@@ -13,16 +27,6 @@ pub struct PostError {
 #[derive(Clone, Copy, Debug, Deserialize, Enum, Eq, PartialEq, Serialize)]
 pub enum PostErrorCode {
     Unauthorized,
-}
-
-impl PostError {
-    pub fn unathorized() -> Self {
-        PostError {
-            field: None,
-            message: Some(String::from("Token is either missing or invalid.")),
-            code: PostErrorCode::Unauthorized,
-        }
-    }
 }
 
 impl TryFrom<Error> for PostError {

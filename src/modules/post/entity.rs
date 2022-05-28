@@ -1,4 +1,4 @@
-use async_graphql::{Enum, SimpleObject};
+use async_graphql::Enum;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -19,7 +19,7 @@ impl ToString for Scope {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, SimpleObject)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Post {
     pub id: Uuid,
     pub content: String,

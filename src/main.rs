@@ -9,6 +9,7 @@ mod responders;
 mod routes;
 mod services;
 
+use async_graphql::dataloader::DataLoader;
 use async_graphql::EmptySubscription;
 use dotenv::dotenv;
 use rocket::routes;
@@ -17,6 +18,7 @@ use std::sync::Arc;
 
 use self::config::Config;
 use self::database::Database;
+use self::graphql::loaders::UserLoader;
 use self::graphql::{Mutation, Query, Schema};
 use self::routes::{cors_preflight, graphql_playground, graphql_request};
 use self::services::Services;
@@ -31,10 +33,15 @@ async fn rocket() -> _ {
 
     let config = Config::new();
     let database = Database::new(&config).await;
-    let services = Services::new(&config, database);
+    let database = Arc::new(database);
+    let services = Services::new(&config, Arc::clone(&database));
     let services = Arc::new(services);
     let graphql_schema = Schema::build(Query::default(), Mutation::default(), EmptySubscription)
         .data(Arc::clone(&services))
+        .data(DataLoader::new(
+            UserLoader::new(Arc::clone(&database)),
+            rocket::tokio::spawn,
+        ))
         .finish();
 
     rocket::custom(&config.server_config)

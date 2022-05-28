@@ -6,16 +6,15 @@ use crate::error::Result;
 use crate::graphql::loaders::UserLoader;
 use crate::graphql::relay::{self, RelayConnection};
 use crate::modules::post::graphql::{Post, PostError};
-use crate::routes::AuthToken;
 use crate::services::Services;
 
 #[derive(SimpleObject)]
-pub struct Posts {
-    posts: Option<RelayConnection<Post>>,
+pub struct Feed {
+    feed: Option<RelayConnection<Post>>,
     error: Option<PostError>,
 }
 
-impl Posts {
+impl Feed {
     pub async fn exec(
         ctx: &Context<'_>,
         after: Option<String>,
@@ -23,12 +22,9 @@ impl Posts {
         first: Option<i32>,
         last: Option<i32>,
     ) -> Result<Self> {
-        let auth = ctx.data_unchecked::<AuthToken>();
-        let token = auth.token()?;
         let services = ctx.data::<Arc<Services>>().unwrap();
-        let user = services.auth.whoami(token).await?;
 
-        match services.post.find_by_author(user).await {
+        match services.post.find_public_posts().await {
             Ok(posts) => {
                 let user_loader = ctx.data_unchecked::<DataLoader<UserLoader>>();
                 let users = user_loader
@@ -45,16 +41,16 @@ impl Posts {
                 });
                 let posts_connection =
                     relay::query(posts, relay::Params::new(after, before, first, last), 10).await?;
-                Ok(Posts {
-                    posts: Some(posts_connection),
+                Ok(Feed {
+                    feed: Some(posts_connection),
                     error: None,
                 })
             }
             Err(err) => {
                 let post_error = PostError::try_from(err)?;
 
-                Ok(Posts {
-                    posts: None,
+                Ok(Feed {
+                    feed: None,
                     error: Some(post_error),
                 })
             }
