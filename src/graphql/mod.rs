@@ -1,3 +1,4 @@
+pub mod loaders;
 pub mod relay;
 
 use async_graphql::{EmptySubscription, MergedObject};

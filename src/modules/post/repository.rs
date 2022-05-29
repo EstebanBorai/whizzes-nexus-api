@@ -98,4 +98,24 @@ impl PostRepository {
             updated_at: result.updated_at,
         })
     }
+
+    pub async fn find_public_posts(&self) -> Result<Vec<Post>> {
+        let result: Vec<PostsTableRow> =
+            sqlx::query_as("SELECT * FROM posts WHERE scope = 'public' LIMIT 20")
+                .fetch_all(&self.database.conn_pool)
+                .await?;
+        let posts = result
+            .into_iter()
+            .map(|row| Post {
+                id: row.id,
+                user_id: row.user_id,
+                content: row.content,
+                scope: row.scope,
+                created_at: row.created_at,
+                updated_at: row.updated_at,
+            })
+            .collect::<Vec<Post>>();
+
+        Ok(posts)
+    }
 }

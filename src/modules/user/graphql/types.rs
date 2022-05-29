@@ -10,16 +10,6 @@ pub struct UserError {
     code: UserErrorCode,
 }
 
-impl UserError {
-    pub fn unathorized() -> Self {
-        UserError {
-            field: None,
-            message: Some(String::from("Token is either missing or invalid.")),
-            code: UserErrorCode::Unauthorized,
-        }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Deserialize, Enum, Eq, PartialEq, Serialize)]
 pub enum UserErrorCode {
     Unauthorized,

@@ -47,4 +47,21 @@ impl PostService {
 
         Ok(posts)
     }
+
+    pub async fn find_public_posts(&self) -> Result<Vec<Post>> {
+        let posts = self.repository.find_public_posts().await?;
+        let posts: Vec<Post> = posts
+            .into_iter()
+            .map(|post| Post {
+                id: post.id,
+                content: post.content,
+                scope: post.scope,
+                user_id: post.user_id,
+                created_at: post.created_at,
+                updated_at: post.updated_at,
+            })
+            .collect();
+
+        Ok(posts)
+    }
 }

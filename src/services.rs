@@ -13,8 +13,7 @@ pub struct Services {
 }
 
 impl Services {
-    pub fn new(config: &Config, database: Database) -> Self {
-        let database = Arc::new(database);
+    pub fn new(config: &Config, database: Arc<Database>) -> Self {
         let user_repository = Arc::new(UserRepository::new(Arc::clone(&database)));
         let user_service = Arc::new(UserService::new(Arc::clone(&user_repository)));
         let post_repository = Arc::new(PostRepository::new(Arc::clone(&database)));
