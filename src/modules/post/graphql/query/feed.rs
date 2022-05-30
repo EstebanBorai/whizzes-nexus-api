@@ -24,7 +24,7 @@ impl Feed {
     ) -> Result<Self> {
         let services = ctx.data::<Arc<Services>>().unwrap();
 
-        match services.post.find_public_posts().await {
+        match services.post.find_public_posts(first).await {
             Ok(posts) => {
                 let user_loader = ctx.data_unchecked::<DataLoader<UserLoader>>();
                 let users = user_loader

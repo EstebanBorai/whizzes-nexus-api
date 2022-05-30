@@ -48,8 +48,9 @@ impl PostService {
         Ok(posts)
     }
 
-    pub async fn find_public_posts(&self) -> Result<Vec<Post>> {
-        let posts = self.repository.find_public_posts().await?;
+    pub async fn find_public_posts(&self, first: Option<i32>) -> Result<Vec<Post>> {
+        let first = first.unwrap_or(10);
+        let posts = self.repository.find_public_posts(first).await?;
         let posts: Vec<Post> = posts
             .into_iter()
             .map(|post| Post {
