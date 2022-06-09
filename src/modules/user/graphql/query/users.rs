@@ -14,6 +14,11 @@ pub struct Users {
     error: Option<UserError>,
 }
 
+#[derive(SimpleObject)]
+pub struct UsersFilter {
+    pub username: Option<String>,
+}
+
 impl Users {
     pub async fn exec(
         ctx: &Context<'_>,
@@ -21,6 +26,7 @@ impl Users {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
+        filter: Option<UsersFilter>,
     ) -> Result<Users> {
         let auth = ctx.data_unchecked::<AuthToken>();
         let services = ctx.data_unchecked::<Arc<Services>>();
@@ -28,7 +34,7 @@ impl Users {
 
         services.auth.whoami(token).await?;
 
-        match services.user.find_all().await {
+        match services.user.find_all(filter).await {
             Ok(users) => {
                 let users_connection = relay::query(
                     users.into_iter(),
