@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>nexus</h1>
+  <h1>nexus-api</h1>
   <h4 align="center">Self-hosteable social network</h4>
 </div>
 
