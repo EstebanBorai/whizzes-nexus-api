@@ -29,6 +29,14 @@ async fn rocket() -> _ {
 
     if cfg!(debug_assertions) {
         dotenv().expect("No \".env\" file found. Copy the current \".env.sample\" file into a \".env\" file and run the server again.");
+    } else {
+        let _guard = sentry::init((
+            option_env!("SENTRY_DSN"),
+            sentry::ClientOptions {
+                release: sentry::release_name!(),
+                ..Default::default()
+            },
+        ));
     }
 
     let config = Config::new();

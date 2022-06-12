@@ -17,6 +17,7 @@ rand = "0.8.5"
 regex = "1.5.5"
 rocket = { version = "0.5.0-rc.1", features = ["json"] }
 rust-argon2 = "1.0.0"
+sentry = "0.26.0"
 serde = "1.0.130"
 serde_json = "1.0.68"
 sqlx = { version = "0.5", features = [ "chrono", "postgres", "runtime-tokio-rustls", "uuid" ] }
