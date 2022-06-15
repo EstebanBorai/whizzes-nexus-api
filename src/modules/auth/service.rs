@@ -33,30 +33,34 @@ impl AuthService {
     /// Validate provided `username` and `password`. If valid, fetches the
     /// corresponding user and signs a JSON Web Token.
     pub async fn create_token(&self, username: String, password: String) -> Result<Tokens> {
-        let user = self.user_service.find_by_username(&username).await?;
-        let is_valid_password = argon2::verify_encoded(&user.password_hash, password.as_bytes())?;
+        let find_user_by_username = self.user_service.find_by_username(&username).await?;
 
-        if is_valid_password {
-            let iat = Utc::now().timestamp() as usize;
-            let exp = Utc::now()
-                .checked_add_signed(Duration::days(30))
-                .unwrap()
-                .timestamp() as usize;
+        if let Some(user) = find_user_by_username {
+            let is_valid_password =
+                argon2::verify_encoded(&user.password_hash, password.as_bytes())?;
 
-            let claims = Claims {
-                sub: String::from("nexus"),
-                iat,
-                exp,
-                uid: username,
-            };
+            if is_valid_password {
+                let iat = Utc::now().timestamp() as usize;
+                let exp = Utc::now()
+                    .checked_add_signed(Duration::days(30))
+                    .unwrap()
+                    .timestamp() as usize;
 
-            let access_token = encode(
-                &Header::default(),
-                &claims,
-                &EncodingKey::from_secret(&self.jwt_secret),
-            )?;
+                let claims = Claims {
+                    sub: String::from("nexus"),
+                    iat,
+                    exp,
+                    uid: username,
+                };
 
-            return Ok(Tokens { access_token });
+                let access_token = encode(
+                    &Header::default(),
+                    &claims,
+                    &EncodingKey::from_secret(&self.jwt_secret),
+                )?;
+
+                return Ok(Tokens { access_token });
+            }
         }
 
         Err(Error::code(ErrorCode::InvalidCredentials))
@@ -69,8 +73,14 @@ impl AuthService {
             &DecodingKey::from_secret(&self.jwt_secret),
             &Validation::default(),
         )?;
-        let username = token.claims.uid;
 
-        self.user_service.find_by_username(&username).await
+        let username = token.claims.uid;
+        let find_user_by_username = self.user_service.find_by_username(&username).await?;
+
+        if let Some(user) = find_user_by_username {
+            return Ok(user);
+        }
+
+        Err(Error::code(ErrorCode::InvalidCredentials))
     }
 }

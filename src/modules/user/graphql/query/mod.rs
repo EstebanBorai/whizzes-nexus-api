@@ -6,7 +6,7 @@ use async_graphql::{Context, Object};
 use crate::error::Result;
 
 use self::me::Me;
-use self::users::Users;
+use self::users::{Users, UsersFilter};
 
 #[derive(Default)]
 pub struct UserQuery;
@@ -25,7 +25,8 @@ impl UserQuery {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
+        filter: Option<UsersFilter>,
     ) -> Result<Users> {
-        Users::exec(ctx, after, before, first, last).await
+        Users::exec(ctx, after, before, first, last, filter).await
     }
 }

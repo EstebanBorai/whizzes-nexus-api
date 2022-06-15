@@ -23,7 +23,7 @@ impl UserService {
         Ok(users)
     }
 
-    pub async fn find_by_username(&self, username: &str) -> Result<User> {
+    pub async fn find_by_username(&self, username: &str) -> Result<Option<User>> {
         self.repository.find_by_username(username).await
     }
 

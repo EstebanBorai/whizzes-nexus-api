@@ -77,13 +77,18 @@ impl UserRepository {
         Ok(users)
     }
 
-    pub async fn find_by_username(&self, username: &str) -> Result<User> {
-        let result: UsersTableRow = sqlx::query_as("SELECT * FROM users WHERE username = $1")
-            .bind(username)
-            .fetch_one::<&Pool<Postgres>>(&self.database.conn_pool)
-            .await?;
+    pub async fn find_by_username(&self, username: &str) -> Result<Option<User>> {
+        let result: Option<UsersTableRow> =
+            sqlx::query_as("SELECT * FROM users WHERE username = $1")
+                .bind(username)
+                .fetch_optional::<&Pool<Postgres>>(&self.database.conn_pool)
+                .await?;
 
-        Ok(User::from(result))
+        if let Some(user) = result {
+            return Ok(Some(User::from(user)));
+        }
+
+        Ok(None)
     }
 
     pub async fn insert(&self, dto: InsertUserTableRow) -> Result<User> {
