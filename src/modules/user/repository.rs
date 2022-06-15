@@ -9,7 +9,6 @@ use crate::database::Database;
 use crate::error::Result;
 
 use super::entity::User;
-use super::graphql::users::UsersFilter;
 use super::{Gender, Pronoun};
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
@@ -69,28 +68,7 @@ impl UserRepository {
         Self { database }
     }
 
-    pub async fn find_all(&self, filter: Option<UsersFilter>) -> Result<Vec<User>> {
-        if let Some(users_filter) = filter {
-            let mut query = String::from("SELECT * FROM users WHERE");
-            let mut binds = Vec::new();
-
-            if let Some(username) = users_filter.username {
-                query.push_str(" users.username = $1");
-                binds.push(username);
-            }
-
-            let mut query = sqlx::query_as(query.as_str());
-
-            for binding in binds {
-                query = query.bind(binding);
-            }
-
-            let result: Vec<UsersTableRow> = query.fetch_all(&self.database.conn_pool).await?;
-            let users = result.into_iter().map(User::from).collect::<Vec<User>>();
-
-            return Ok(users);
-        }
-
+    pub async fn find_all(&self) -> Result<Vec<User>> {
         let result: Vec<UsersTableRow> = sqlx::query_as("SELECT * FROM users")
             .fetch_all(&self.database.conn_pool)
             .await?;
@@ -99,13 +77,18 @@ impl UserRepository {
         Ok(users)
     }
 
-    pub async fn find_by_username(&self, username: &str) -> Result<User> {
-        let result: UsersTableRow = sqlx::query_as("SELECT * FROM users WHERE username = $1")
-            .bind(username)
-            .fetch_one::<&Pool<Postgres>>(&self.database.conn_pool)
-            .await?;
+    pub async fn find_by_username(&self, username: &str) -> Result<Option<User>> {
+        let result: Option<UsersTableRow> =
+            sqlx::query_as("SELECT * FROM users WHERE username = $1")
+                .bind(username)
+                .fetch_optional::<&Pool<Postgres>>(&self.database.conn_pool)
+                .await?;
 
-        Ok(User::from(result))
+        if let Some(user) = result {
+            return Ok(Some(User::from(user)));
+        }
+
+        Ok(None)
     }
 
     pub async fn insert(&self, dto: InsertUserTableRow) -> Result<User> {

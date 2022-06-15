@@ -1,4 +1,4 @@
-use async_graphql::{Context, SimpleObject};
+use async_graphql::{Context, InputObject, SimpleObject};
 use std::sync::Arc;
 
 use crate::error::Result;
@@ -14,7 +14,7 @@ pub struct Users {
     error: Option<UserError>,
 }
 
-#[derive(SimpleObject)]
+#[derive(InputObject)]
 pub struct UsersFilter {
     pub username: Option<String>,
 }
@@ -34,7 +34,42 @@ impl Users {
 
         services.auth.whoami(token).await?;
 
-        match services.user.find_all(filter).await {
+        if let Some(filter) = filter {
+            if let Some(username) = filter.username {
+                return match services.user.find_by_username(username.as_str()).await {
+                    Ok(find_by_username) => {
+                        // The result is wrapped into a `Vec<User>` to keep
+                        // responses consistent.
+                        let res = if let Some(user) = find_by_username {
+                            vec![user]
+                        } else {
+                            Vec::default()
+                        };
+
+                        let users_connection = relay::query(
+                            res.into_iter(),
+                            relay::Params::new(after, before, first, last),
+                            10,
+                        )
+                        .await?;
+                        Ok(Users {
+                            users: Some(users_connection),
+                            error: None,
+                        })
+                    }
+                    Err(err) => {
+                        let user_error = UserError::try_from(err)?;
+
+                        Ok(Users {
+                            users: None,
+                            error: Some(user_error),
+                        })
+                    }
+                };
+            }
+        }
+
+        match services.user.find_all().await {
             Ok(users) => {
                 let users_connection = relay::query(
                     users.into_iter(),

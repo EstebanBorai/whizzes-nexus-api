@@ -6,7 +6,6 @@ use std::sync::Arc;
 use crate::error::Result;
 use crate::modules::user::graphql::account_register::AccountRegisterInput;
 
-use super::graphql::users::UsersFilter;
 use super::{InsertUserTableRow, User, UserRepository};
 
 pub struct UserService {
@@ -18,13 +17,13 @@ impl UserService {
         Self { repository }
     }
 
-    pub async fn find_all(&self, filter: Option<UsersFilter>) -> Result<Vec<User>> {
-        let users = self.repository.find_all(filter).await?;
+    pub async fn find_all(&self) -> Result<Vec<User>> {
+        let users = self.repository.find_all().await?;
 
         Ok(users)
     }
 
-    pub async fn find_by_username(&self, username: &str) -> Result<User> {
+    pub async fn find_by_username(&self, username: &str) -> Result<Option<User>> {
         self.repository.find_by_username(username).await
     }
 
