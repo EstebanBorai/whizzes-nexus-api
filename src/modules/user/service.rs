@@ -24,18 +24,21 @@ impl UserService {
     }
 
     pub async fn find_by_username(&self, username: &str) -> Result<Option<User>> {
-        self.repository.find_by_username(username).await
+        let username = username.to_string().to_lowercase();
+
+        self.repository.find_by_username(&username).await
     }
 
     pub async fn create(&self, payload: AccountRegisterInput) -> Result<User> {
         let password_hash = self.hash_password(&payload.password)?;
+        let username = payload.username.to_lowercase();
         let inserted = self
             .repository
             .insert(InsertUserTableRow {
                 name: payload.name,
                 last_name: payload.last_name,
                 email: payload.email,
-                username: payload.username,
+                username,
                 gender: payload.gender,
                 pronoun: payload.pronoun,
                 custom_gender: payload.custom_gender,
