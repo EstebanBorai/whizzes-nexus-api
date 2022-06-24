@@ -74,8 +74,8 @@ pub fn cors_preflight() -> CorsPreflight {
 }
 
 #[rocket::get("/graphql")]
-pub fn graphql_playground() -> content::Html<String> {
-    content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+pub fn graphql_playground() -> content::RawHtml<String> {
+    content::RawHtml(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
 #[rocket::post("/graphql", data = "<request>", format = "application/json")]

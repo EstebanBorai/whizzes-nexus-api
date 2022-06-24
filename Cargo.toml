@@ -15,7 +15,7 @@ itertools = "0.10.3"
 jsonwebtoken = "8.0.1"
 rand = "0.8.5"
 regex = "1.5.5"
-rocket = { version = "0.5.0-rc.1", features = ["json"] }
+rocket = { version = "0.5.0-rc.2", features = ["json"] }
 rust-argon2 = "1.0.0"
 sentry = "0.26.0"
 serde = "1.0.130"
